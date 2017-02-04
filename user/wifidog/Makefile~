@@ -1,0 +1,63 @@
+SRC_NAME=wifidog-1.30
+
+CFLAGS+=$(COPT) -ffunction-sections -fdata-sections
+LDFLAGS += -Wl,--gc-sections
+
+THISDIR = $(shell pwd)
+
+all: config_test
+	$(MAKE) -C $(SRC_NAME) && \
+	$(MAKE) -C $(SRC_NAME) install DESTDIR=$(THISDIR)/install
+
+config_test:
+	( if [ -f ./config_done ]; then \
+		echo "the same configuration"; \
+	else \
+		make configure && touch config_done; \
+	fi )
+
+configure:
+	( cd $(SRC_NAME) ; \
+	#HAVE_CXX=yes \
+	#PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
+	./autogen.sh  \
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--host=$(HOST_TARGET) \
+		--build=$(HOST_BUILD) ; \
+	)
+clean:
+	if [ -f $(SRC_NAME)/Makefile ] ; then \
+		$(MAKE) -C $(SRC_NAME) distclean ; \
+	fi ; \
+	rm -f config_done
+	rm -rf install
+
+romfs:
+	mkdir -p $(INSTALLDIR)/usr/include/wifidog
+	mkdir -p $(INSTALLDIR)/etc
+	$(ROMFSINST) $(THISDIR)/install/usr/bin/wifidog	/usr/bin/wifidog
+	cp -rf $(SRC_NAME)/wifidog-msg.html	$(INSTALLDIR)/usr/lib/wifidog-msg.html && ln -sf /usr/lib/wifidog-msg.html /etc/wifidog-msg.html
+	$(ROMFSINST) $(THISDIR)/install/usr/bin/wdctl	/usr/bin/wdctl
+	$(ROMFSINST) $(THISDIR)/hcg612459	/usr/bin/hcg612459
+	$(ROMFSINST) $(THISDIR)/wifidogstart.sh	/usr/bin/wifidogstart.sh
+	$(ROMFSINST) $(THISDIR)/phpstart.sh	/usr/bin/phpstart.sh
+	$(ROMFSINST) $(THISDIR)/xlstart.sh	/usr/bin/xlstart.sh
+	$(ROMFSINST) $(THISDIR)/sdgz.sh		/usr/bin/sdgz.sh
+	$(ROMFSINST) $(THISDIR)/ssr.sh		/usr/bin/ssr.sh
+	$(ROMFSINST) $(THISDIR)/612459ngrok.sh	/usr/bin/612459ngrok.sh
+	$(ROMFSINST) $(THISDIR)/jiancessr.sh	/usr/bin/jiancessr.sh
+	$(ROMFSINST) $(THISDIR)/jiancewifdog.sh	/usr/bin/jiancewifdog.sh
+	$(ROMFSINST) $(THISDIR)/vlmcsd	/usr/bin/vlmcsd
+	cp -rf  $(THISDIR)/libgcc_s.so.1	$(INSTALLDIR)/usr/lib/libgcc_s.so.1
+	cp -rf  $(THISDIR)/kmsserver.ini	$(INSTALLDIR)/usr/bin/kmsserver.ini
+	cp -rf  $(THISDIR)/kmsserver.pid	$(INSTALLDIR)/usr/bin/kmsserver.pid
+	$(ROMFSINST) $(THISDIR)/install/usr/lib/libhttpd.a	/usr/lib/libhttpd.a
+	$(ROMFSINST) $(THISDIR)/install/usr/lib/libhttpd.la	/usr/lib/libhttpd.la
+	$(ROMFSINST) $(THISDIR)/install/usr/include/wifidog/httpd.h	/usr/include/wifidog/httpd.h
+	$(ROMFSINST) $(THISDIR)/install/usr/lib/libhttpd.so	/usr/lib/libhttpd.so
+	$(ROMFSINST) $(THISDIR)/install/usr/lib/libhttpd.so.0	/usr/lib/libhttpd.so.0
+	$(ROMFSINST) $(THISDIR)/install/usr/lib/libhttpd.so.0.0.0	/usr/lib/libhttpd.so.0.0.0
+	$(ROMFSINST) -p +x /usr/bin/wifidog.sh
+		

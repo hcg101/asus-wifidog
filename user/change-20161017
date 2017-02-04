@@ -1,0 +1,7 @@
+	trunk/user/rc/common_ex.c
+	trunk/user/rc/net_lan.c
+	trunk/user/rc/rc.h
+	trunk/user/shared/cflags.mk
+	trunk/user/shared/defaults.c
+	trunk/user/shared/defaults.h
+

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+PIDS=$(ps | grep "/usr/bin/wifidog" | grep -v "grep" | wc -l)
+if [ "$PIDS" != 1 ] ; then
+exit 0
+else
+/usr/bin/wifidog.sh restart
+logger -t "wifidog" "wan口重新拨号、重启wifidog服务完成！！！"
+fi
